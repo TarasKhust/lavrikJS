@@ -2,8 +2,18 @@
 'use strict';
 
 function watchObj(node, callback) {
-	/* return new Proxy(node, {...}) */
-	return node;
+	return new Proxy(node, {
+		set(target, name, value) {
+			target[name] = value;
+			callback(name, value);
+			return true;
+		},
+
+		get(target, name) {
+			return watchObj(target[name], callback);
+		},
+
+	});
 }
 
 class EmailParser {
@@ -12,15 +22,15 @@ class EmailParser {
 	}
 
 	get isCorrect() {
-		return (/\S+@\S+\.\S+/).test(this.email) ? true : null
+		return (/\S+@\S+\.\S+/).test(this.email) ? true : null;
 	}
 
 	get name() {
-		return this.isCorrect ? true : null
+		return this.isCorrect ? true : null;
 	}
 
 	get domain() {
-		return this.isCorrect ? true : null
+		return this.isCorrect ? true : null;
 	}
 }
 
