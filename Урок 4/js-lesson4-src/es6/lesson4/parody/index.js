@@ -1,52 +1,56 @@
 /* global HTMLElement */
-export class Parody{
-    constructor(props){
-        if(typeof props !== "object"){
-            props = {};
-        }
+export class Parody {
+	constructor(props) {
+		if (typeof props !== 'object') {
+			props = {};
+		}
 
-        this.props = props;
-        this.isMount = false;
-        this.targetNode;
-    }
+		this.props = props;
+		this.isMount = false;
+		this.targetNode;
+	}
 
-    bindMount(selector){
-        this.isMount = true;
-        this.targetNode = document.querySelector(selector);
-        return this;
-    }
+	bindMount(selector) {
+		this.isMount = true;
+		this.targetNode = document.querySelector(selector);
+		return this;
+	}
 
-    render(node){
-        if(this.isMount){
-            this.targetNode.innerHTML = '';
-            this.targetNode.appendChild(node);
-        }
+	render(node) {
+		if (this.isMount) {
+			this.targetNode.innerHTML = '';
+			this.targetNode.appendChild(node);
+		}
 
-        return node;
-    }
+		return node;
+	}
 }
 
-export function ParodyDom(tag, props, ...children){
-    if(typeof tag === "function"){
-        return (new tag(props)).render();
-    }
-    console.log(tag);
-    console.log(props);
-    console.log(children);
-    
-    let node = document.createElement(tag);
+export function ParodyDom(tag, props, ...children) {
+	if (typeof tag === 'function') {
+		return (new tag(props)).render();
+	}
+	console.log(tag);
+	console.log(props);
+	console.log(children);
 
-    children.forEach((child) => {
-        if(child instanceof HTMLElement){
-            node.appendChild(child);
-        }
-        else{
-            let textNode = document.createTextNode(child);
-            node.appendChild(textNode);
-        }
-    });
+	let node = document.createElement(tag);
 
-    Object.assign(node, props);
+	function addChildren(child) {
+		if (child instanceof HTMLElement)
+			node.appendChild(child);
+		else if (typeof child === 'object')
+			for (let item of child)
+				addChildren(item);
+		else {
+			let textNode = document.createTextNode(child);
+			node.appendChild(textNode);
+		}
+	}
 
-    return node;
+	children.forEach(addChildren);
+
+	Object.assign(node, props);
+
+	return node;
 }
